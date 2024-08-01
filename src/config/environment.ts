@@ -7,7 +7,7 @@ import _ from 'lodash';
 export default {
   // 기준 환경
   env: process.env.NODE_ENV || 'development',
-  serviceName: require('../../package.json').name,
+  serviceName: require(process.env.PWD + '/package.json').name,
   // 서버 루트 경로
   root: path.normalize(`${__dirname}/../..`),
 
@@ -24,7 +24,7 @@ export default {
   timezone: process.env.TZ || 'Asia/Seoul',
   appRoot: process.env.PWD,
   heyHome: {
-    code: require('../../hey-code.json')?.name,
-    time: require('../../hey-code.json')?.time,
+    code: require(process.env.PWD + '/hey-code.json')?.name,
+    time: require(process.env.PWD + '/hey-code.json')?.time,
   },
 };
