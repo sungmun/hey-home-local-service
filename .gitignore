@@ -2,5 +2,5 @@
 /node_modules
 /logs
 /dist
-hey-code.json
-yarn.lock
+./hey-code.json
+./yarn.lock
