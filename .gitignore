@@ -3,4 +3,5 @@
 /logs
 /dist
 ./hey-code.json
-./yarn.lock
+/keys
+yarn.lock

@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "dev:start": "ts-node-dev --respawn --transpile-only --env-file='.env' ./src/index.ts",
-    "start": "node $NODE_DEBUG_OPTION dist/src/index.js -e ts",
+    "start": "node $NODE_DEBUG_OPTION dist/src/index.js -e ts --env-file='.env'",
     "views": "cp -r ./public ./dist/public",
     "clean": "rm -rf ./dist",
     "build": "yarn clean && tsc -p src && yarn views"
