@@ -1,3 +1,6 @@
 .env
 /node_modules
 /logs
+/dist
+hey-code.json
+yarn.lock

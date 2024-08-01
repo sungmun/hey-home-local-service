@@ -6,7 +6,10 @@
   "author": "sungmun <tjdans174@mealant.com>",
   "license": "MIT",
   "scripts": {
-    "dev:start": "ts-node-dev --respawn --transpile-only --env-file='.env' ./src/index.ts"
+    "dev:start": "ts-node-dev --respawn --transpile-only --env-file='.env' ./src/index.ts",
+    "views": "cp -r ./public ./dist/public",
+    "clean": "rm -rf ./dist",
+    "build": "yarn clean && tsc -p src && yarn views"
   },
   "dependencies": {
     "axios": "^1.7.2",
