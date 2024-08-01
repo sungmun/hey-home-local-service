@@ -2,7 +2,6 @@ import _ from 'lodash';
 import axios, { Method } from 'axios';
 
 import pkg from '../../package.json';
-import env from '../config/environment';
 
 import { RequiredError } from './error';
 
@@ -18,7 +17,6 @@ const getRequest = async (url = '', method = 'GET', body = undefined, inputHeade
 
   const basicHeaders = {
     'User-Agent': `${pkg.name}/v${pkg.version}`,
-    'tabling-server-key': env.secrets.server,
   };
 
   const headers = _.merge(basicHeaders, inputHeaders);
