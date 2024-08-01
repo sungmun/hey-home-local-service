@@ -28,7 +28,7 @@ export default {
     time: require(process.env.PWD + '/hey-code.json')?.time,
   },
   https: {
-    key: process.env.HTTPS_KEY_PATH,
-    crt: process.env.HTTPS_CRT_PATH,
+    key: process.env.HTTPS_KEY_PATH || '',
+    crt: process.env.HTTPS_CRT_PATH || '',
   },
 };
