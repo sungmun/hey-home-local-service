@@ -40,4 +40,33 @@ const findOneRoomBySensorId = async (sensorId: string): Promise<Room> => {
   return <Room>query.get(sensorId);
 };
 
-export default { bulkInsertRooms, findAllRooms, updateRoomTemperature, updateRoomActiveByName, findOneRoomBySensorId };
+const findOneRoomByName = async (name: string): Promise<Room> => {
+  const client = sqliteConnect.getClient();
+  const query = await client.prepare('SELECT * FROM Rooms WHERE name=?');
+  return <Room>query.get(name);
+};
+
+const updateOneRoomMinTemperatureById = async (id: string, temperature: number) => {
+  const client = sqliteConnect.getClient();
+  let statemnt = client.prepare('UPDATE Rooms SET minTemperature=? WHERE id=?');
+
+  statemnt.run(id, temperature);
+};
+
+const updateOneRoomMaxTemperatureById = async (id: string, temperature: number) => {
+  const client = sqliteConnect.getClient();
+  let statemnt = client.prepare('UPDATE Rooms SET maxTemperature=? WHERE id=?');
+
+  statemnt.run(id, temperature);
+};
+
+export default {
+  bulkInsertRooms,
+  findAllRooms,
+  updateRoomTemperature,
+  updateRoomActiveByName,
+  findOneRoomBySensorId,
+  findOneRoomByName,
+  updateOneRoomMinTemperatureById,
+  updateOneRoomMaxTemperatureById,
+};

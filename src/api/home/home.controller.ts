@@ -6,6 +6,12 @@ class HomeController {
   async putMode(req: Request, res: Response) {
     return serivce.setMode(req.body.mode).then(mResponse.respondWithNoContent(res)).catch(mResponse.handleError(res));
   }
+  async putRoomTemperature(req: Request, res: Response) {
+    return serivce
+      .setRoomTemperature(req.params.roomName, req.body)
+      .then(mResponse.respondWithNoContent(res))
+      .catch(mResponse.handleError(res));
+  }
 }
 
 export const homeController = new HomeController();
