@@ -8,7 +8,7 @@ class HomeController {
   }
   async putRoomTemperature(req: Request, res: Response) {
     return serivce
-      .setRoomTemperature(req.params.roomName, req.body)
+      .setRoomTemperature(req.body)
       .then(mResponse.respondWithNoContent(res))
       .catch(mResponse.handleError(res));
   }
