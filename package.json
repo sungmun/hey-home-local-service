@@ -10,7 +10,7 @@
     "start": "node $NODE_DEBUG_OPTION --experimental-sqlite --env-file='.env' dist/src/index.js -e ts ",
     "views": "cp -r ./public ./dist/public",
     "clean": "rm -rf ./dist",
-    "build": "yarn clean && tsc && yarn views",
+    "build": "yarn clean && tsc && yarn views"
   },
   "dependencies": {
     "amqplib": "^0.10.4",
