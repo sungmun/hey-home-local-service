@@ -50,14 +50,14 @@ const updateOneRoomMinTemperatureById = async (id: string, temperature: number) 
   const client = sqliteConnect.getClient();
   let statemnt = client.prepare('UPDATE Rooms SET minTemperature=? WHERE id=?');
 
-  statemnt.run(id, temperature);
+  statemnt.run(temperature, id);
 };
 
 const updateOneRoomMaxTemperatureById = async (id: string, temperature: number) => {
   const client = sqliteConnect.getClient();
   let statemnt = client.prepare('UPDATE Rooms SET maxTemperature=? WHERE id=?');
 
-  statemnt.run(id, temperature);
+  statemnt.run(temperature, id);
 };
 
 export default {
