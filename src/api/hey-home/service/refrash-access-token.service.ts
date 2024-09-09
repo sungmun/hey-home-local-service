@@ -7,8 +7,11 @@ import { AxiosError } from 'axios';
 const exec = async () => {
   const refreshToken = environment.heyHome.refreshToken;
   const heyCode = require(process.env.PWD + '/hey-code.json');
-  logger.debug('expires_in', { data: heyCode.expires_in });
 
+  if (Date.now() - 24 * 60 * 1000 > Date.parse(heyCode.expires_in)) {
+    logger.debug('expires_in', { data: heyCode.expires_in });
+    return;
+  }
   const res = await heyHomeAgent
     .post(
       '/oauth/token',

@@ -13,7 +13,7 @@ const getDeviceCloudLiveData = async (device: Device) => {
   } else {
     res = await heyHomeAgent.get(`/openapi/device/${device.id}`);
   }
-  // logger.info(`device : ${device.name}`, { data: res?.data });
+
   return res.data;
 };
 
@@ -24,9 +24,6 @@ const exec = async (eventEmitter: EventEmitter) => {
     return promise.then(async () => {
       const liveData = await getDeviceCloudLiveData(cur).then(device => device.deviceState);
       if (cur.roomId && cur.deviceType === 'SensorTh') {
-        logger.debug('room seosor test', {
-          data: { id: cur.roomId, sensorId: cur.id, temperature: liveData.temperature },
-        });
         await roomDao.updateRoomTemperature({
           id: cur.roomId,
           sensorId: cur.id,

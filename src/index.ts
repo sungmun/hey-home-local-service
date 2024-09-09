@@ -30,7 +30,9 @@ const refrashIotDiviceList = async () => {
 
 const watchIotDevices = async eventEmitter => {
   for await (const time of setInterval(1000 * 30)) {
-    refreshAllIotDeviceDataService.exec(eventEmitter);
+    refreshAllIotDeviceDataService.exec(eventEmitter).catch(error => {
+      logger.error(`refreshAllIotDeviceDataService error: ${error.message}`);
+    });
   }
 };
 
@@ -84,12 +86,19 @@ Promise.resolve()
   })
   .then(async () => {
     await refreshAllIotDeviceDataService.exec(eventEmitter);
-    watchIotDevices(eventEmitter);
-  })
-  .finally(() => {
-    watch(eventEmitter).then(() => {
-      logger.info('wating start');
+    watchIotDevices(eventEmitter).catch(error => {
+      logger.error('watchIotDevices error', { data: error });
     });
+  })
+
+  .finally(() => {
+    watch(eventEmitter)
+      .then(() => {
+        logger.info('wating start');
+      })
+      .catch(error => {
+        logger.error('watch error', { data: error });
+      });
   });
 
 server.on('error', (e: Error) => {

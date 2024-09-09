@@ -1,7 +1,8 @@
 import https from 'node:https';
-import axios from 'axios';
+import axios, { Axios, AxiosError } from 'axios';
 import environment from '../config/environment';
 import logger from '../config/logger';
+import refrashAccessTokenService from '../api/hey-home/service/refrash-access-token.service';
 const httpsAgent = new https.Agent({
   keepAlive: true,
   keepAliveMsecs: 3000,
@@ -30,12 +31,17 @@ heyHomeAgent.interceptors.response.use(
   res => {
     return res;
   },
-  error => {
+  (error: AxiosError) => {
     const code = error.code;
     const status = error.response?.status;
     if (code === 'ECONNABORTED' || status === 408) {
       logger.error('요청이 만료되었습니다.');
     }
+    if (status === 401) {
+      refrashAccessTokenService.exec().then(() => logger.info('access token refresh'));
+    }
+
+    throw new Error(error.message);
   },
 );
 export default heyHomeAgent;
