@@ -12,7 +12,10 @@ if (environment.env === environmentConstants.ENV.DEVELOPMENT) {
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize(),
-        winston.format.printf(info => `${info.timestamp} ${info.level} ${info.message}`),
+        winston.format.printf(
+          info =>
+            `${info.timestamp} ${info.level} ${info.message}${info.data ? `\n${JSON.stringify(info.data)}` : ''}\n`,
+        ),
       ),
       level: 'silly',
     }),

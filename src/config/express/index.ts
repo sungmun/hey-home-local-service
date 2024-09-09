@@ -3,13 +3,12 @@ import cookieParser from 'cookie-parser';
 import express from 'express';
 import path from 'path';
 import helmet from 'helmet';
-import cors from 'cors';
 import errorHandler from 'errorhandler';
 import { RouterLogger } from '../logger';
 
 import env from '../environment';
 import constant from '../environment.constants';
-
+import amqp from 'amqplib/callback_api';
 import router from '../../route';
 
 const { ENV } = constant;

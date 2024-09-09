@@ -5,7 +5,12 @@ import mResponse from '../../components/response';
 class HeyHomeController {
   async redirect(req: Request, res: Response) {
     const code = <string>req.query.code;
-    return serivce.redirectCode(code).then(mResponse.respondWithNoContent(res)).catch(mResponse.handleError(res));
+    console.log('code', code);
+    return serivce.redirectCode(code).then(mResponse.respondWithOK(res)).catch(mResponse.handleError(res));
+  }
+
+  async refrashAccessToken(req: Request, res: Response) {
+    return serivce.refrashAccessToken().then(mResponse.respondWithOK(res)).catch(mResponse.handleError(res));
   }
 }
 
