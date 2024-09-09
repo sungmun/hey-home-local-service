@@ -2,6 +2,8 @@
 /node_modules
 /logs
 /dist
-./hey-code.json
+hey-code.json
 /keys
 yarn.lock
+sql_lite.sqlite
+hey-code.json
