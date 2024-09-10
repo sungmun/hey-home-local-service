@@ -3,7 +3,7 @@ import sqliteConnect from '../../config/databases/sqlite/sqlite.connect';
 
 const bulkInsertRooms = async (rooms: Pick<Room, 'id' | 'name'>[]) => {
   const client = sqliteConnect.getClient();
-  const query = `INSERT OR REPLACE INTO Rooms(id,name) VALUES ${rooms
+  const query = `INSERT OR IGNORE INTO Rooms(id,name) VALUES ${rooms
     .map(room => `('${room.id}','${room.name}')`)
     .join(',')}`;
 
