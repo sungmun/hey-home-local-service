@@ -32,7 +32,9 @@ export default async (eventEmitter: EventEmitter) => {
       if (changeTime?.power === data.power) return;
       if (changeTime?.power != null) {
         DeviceLogger.silly(
-          `change aircon status delay: ${Math.floor((Date.now() - changeTime.changeTime) / 1000 / 60)}분`,
+          `change aircon status delay (${changeTime?.power}): ${Math.floor(
+            (Date.now() - changeTime.changeTime) / 1000 / 60,
+          )}분`,
         );
       }
       changeTime.power = data.power;

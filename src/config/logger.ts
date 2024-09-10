@@ -52,12 +52,13 @@ routerLogger.add(
 
 deviceLogger.add(
   new dailyRotate({
-    level: 'info',
+    level: 'silly',
     dirname: './device-logs',
     filename: `${environment.serviceName}-device-%DATE%`,
     maxFiles: 7,
     extension: '.log',
-    format: winston.format.combine(winston.format(info => info.level === 'silly' && info)(), winston.format.simple()),
+    format: winston.format.combine(winston.format(info => info.level === 'silly' && info)(), winston.format.json()),
+    json: true,
   }),
 );
 
