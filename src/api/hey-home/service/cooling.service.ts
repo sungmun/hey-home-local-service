@@ -1,15 +1,14 @@
 import deviceDao from './../../../dao/sqlite/device.dao';
-import deviceLogDao from './../../../dao/sqlite/device-log.dao';
+// import deviceLogDao from './../../../dao/sqlite/device-log.dao';
 import liveDeviceDao from './../../../dao/local/live-device.dao';
 import { Sensor } from './../../../types/device.type';
 import heyHomeAgent from './../../../components/hey-home-request';
 import _ from 'lodash';
 import { Room } from '../../../types/room.type';
+import { DeviceLogger } from '../../../config/logger';
+import { EventEmitter } from 'stream';
 
-const MIN_TEMPERATURE = 27.5;
-const MAX_TEMPERATURE = 28.5;
-
-const airConditionerOn = async airConditioners => {
+const airConditionerOn = async (airConditioners, eventEmitter?: EventEmitter) => {
   await airConditioners
     .filter(airConditioner => {
       const id = airConditioner.id;
@@ -28,13 +27,10 @@ const airConditionerOn = async airConditioners => {
             requirments: deviceStatus,
           }),
         )
-        .then(async () => deviceLogDao.insertLog(airConditioner, deviceStatus))
-        .then(() => {
-          liveDeviceDao.liveDevices.set(airConditioner.id, { ...deviceStatus, power: '켜짐' });
-        });
+        .then(async () => airconStatusChange(airConditioner.id, eventEmitter));
     }, Promise.resolve());
 };
-const airConditionerOff = async airConditioners => {
+const airConditionerOff = async (airConditioners, eventEmitter?: EventEmitter) => {
   await airConditioners
     .filter(airConditioner => {
       const id = airConditioner.id;
@@ -49,22 +45,27 @@ const airConditionerOff = async airConditioners => {
             requirments: deviceStatus,
           }),
         )
-        .then(async () => deviceLogDao.insertLog(airConditioner, deviceStatus))
-        .then(() => {
-          liveDeviceDao.liveDevices.set(airConditioner.id, deviceStatus);
-        });
+        .then(async () => airconStatusChange(airConditioner.id, eventEmitter));
     }, Promise.resolve());
 };
 
-const exec = async (sensor: Sensor, room: Room) => {
-  const airConditioners = await deviceDao.findDeviceByDeviceType('IrAirconditioner');
+const airconStatusChange = async (airconId: string, eventEmitter?: EventEmitter) => {
+  if (eventEmitter === undefined) return;
+  const res = await heyHomeAgent.get(`/openapi/device/${airconId}`);
+  const state = res.data.deviceState;
+  liveDeviceDao.liveDevices.set(airconId, state);
+  eventEmitter.emit(airconId, state);
+};
 
+const exec = async (sensor: Sensor, room: Room, eventEmitter?: EventEmitter) => {
+  const airConditioners = await deviceDao.findDeviceByDeviceType('IrAirconditioner');
+  if (sensor.temperature >= room.maxTemperature && sensor.temperature >= room.minTemperature) {
+    return;
+  }
   if (sensor.temperature > room.maxTemperature) {
-    await airConditionerOn(airConditioners);
-    return;
+    await airConditionerOn(airConditioners, eventEmitter);
   } else if (sensor.temperature < room.minTemperature) {
-    await airConditionerOff(airConditioners);
-    return;
+    await airConditionerOff(airConditioners, eventEmitter);
   }
 };
 

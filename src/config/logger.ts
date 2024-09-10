@@ -21,6 +21,8 @@ if (environment.env === environmentConstants.ENV.DEVELOPMENT) {
     }),
   );
 }
+
+const deviceLogger = logger.child({ name: 'deviceLogger' });
 const routerLogger = logger.child({ name: 'routerLogger' });
 logger.add(
   new dailyRotate({
@@ -30,6 +32,7 @@ logger.add(
     extension: '.log',
     format: winston.format.combine(winston.format(info => info.level !== 'http' && info)(), winston.format.json()),
     json: true,
+    maxFiles: 7,
   }),
 );
 routerLogger.add(
@@ -40,8 +43,21 @@ routerLogger.add(
     filename: `${environment.serviceName}-access-%DATE%`,
     format: winston.format.combine(winston.format(info => info.level === 'http' && info)(), winston.format.json()),
     json: true,
+    maxFiles: 7,
+  }),
+);
+
+deviceLogger.add(
+  new dailyRotate({
+    level: 'info',
+    dirname: './device-logs',
+    filename: `${environment.serviceName}-device-%DATE%`,
+    maxFiles: 7,
+    extension: '.log',
+    format: winston.format.combine(winston.format(info => info.level !== 'http' && info)()),
   }),
 );
 
 export default logger;
 export const RouterLogger = routerLogger;
+export const DeviceLogger = deviceLogger;
