@@ -11,8 +11,9 @@ export default async (eventEmitter: EventEmitter) => {
       return roomDao
         .findOneRoomBySensorId(room.sensorId)
         .then(eventRoom => {
-          if (eventRoom.active === 0) return;
-          logger.info(`cooling processing...(${eventRoom.name})`, { data });
+          logger.info(`cooling process start(${eventRoom.name})`);
+          if ([null, 0].includes(eventRoom.active)) return;
+          logger.info(`cooling processing...`, { data: { data, eventRoom } });
           return coolingService.exec({ ...data, sensorId: room.sensorId }, eventRoom, eventEmitter);
         })
         .catch(error => {
@@ -26,7 +27,7 @@ export default async (eventEmitter: EventEmitter) => {
   const aircons = await deviceDao.findDeviceByDeviceType('IrAirconditioner');
 
   aircons.forEach(aircon => {
-    let changeTime = null;
+    let changeTime = { power: null, changeTime: null };
     eventEmitter.on(aircon.id, data => {
       if (changeTime?.power === data.power) return;
       if (changeTime?.power != null) {
