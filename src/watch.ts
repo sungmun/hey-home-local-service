@@ -31,13 +31,11 @@ export default async (eventEmitter: EventEmitter) => {
     eventEmitter.on(aircon.id, data => {
       if (changeTime?.power === data.power) return;
       if (changeTime?.power != null) {
-        DeviceLogger.log(
-          'device',
+        DeviceLogger.silly(
           `change aircon status delay: ${Math.floor((Date.now() - changeTime.changeTime) / 1000 / 60)}분`,
         );
       }
       changeTime.power = data.power;
-
       changeTime.changeTime = Date.now();
     });
   });
