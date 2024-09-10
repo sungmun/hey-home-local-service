@@ -30,7 +30,10 @@ logger.add(
     dirname: './logs',
     filename: `${environment.serviceName}-service-%DATE%`,
     extension: '.log',
-    format: winston.format.combine(winston.format(info => info.level !== 'http' && info)(), winston.format.json()),
+    format: winston.format.combine(
+      winston.format(info => ['http', 'device'].includes(info.level) === false && info)(),
+      winston.format.json(),
+    ),
     json: true,
     maxFiles: 7,
   }),
@@ -54,7 +57,7 @@ deviceLogger.add(
     filename: `${environment.serviceName}-device-%DATE%`,
     maxFiles: 7,
     extension: '.log',
-    format: winston.format.combine(winston.format(info => info.level !== 'http' && info)()),
+    format: winston.format.combine(winston.format(info => info.level === 'device' && info)(), winston.format.simple()),
   }),
 );
 

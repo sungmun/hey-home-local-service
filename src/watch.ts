@@ -31,7 +31,8 @@ export default async (eventEmitter: EventEmitter) => {
     eventEmitter.on(aircon.id, data => {
       if (changeTime?.power === data.power) return;
       if (changeTime?.power != null) {
-        DeviceLogger.info(
+        DeviceLogger.log(
+          'device',
           `change aircon status delay: ${Math.floor((Date.now() - changeTime.changeTime) / 1000 / 60)}분`,
         );
       }
