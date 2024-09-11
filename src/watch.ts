@@ -42,12 +42,12 @@ export default async (eventEmitter: EventEmitter) => {
         axios
           .post(
             environment.webhook.url,
-            `에어컨(${aircon.name})이 ${changeTime.power} 으로 변경되는데 ${Math.floor(
+            `에어컨(${aircon.name})이 ${data.power} 으로 변경되는데 ${Math.floor(
               (Date.now() - changeTime.changeTime) / 1000 / 60,
             )}분 걸렸습니다`,
             {
               headers: {
-                title: `에어컨 ${changeTime.power}`,
+                Title: `aircon ${data.power === '켜짐' ? 'on' : 'off'}`,
               },
             },
           )
