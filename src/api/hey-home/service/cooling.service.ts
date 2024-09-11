@@ -5,7 +5,7 @@ import { Sensor } from './../../../types/device.type';
 import heyHomeAgent from './../../../components/hey-home-request';
 import _ from 'lodash';
 import { Room } from '../../../types/room.type';
-import { DeviceLogger } from '../../../config/logger';
+import logger, { DeviceLogger } from '../../../config/logger';
 import { EventEmitter } from 'stream';
 
 const airConditionerOn = async (airConditioners, eventEmitter?: EventEmitter) => {
@@ -60,6 +60,15 @@ const airconStatusChange = async (airconId: string, eventEmitter?: EventEmitter)
 const exec = async (sensor: Sensor, room: Room, eventEmitter?: EventEmitter) => {
   const airConditioners = await deviceDao.findDeviceByDeviceType('IrAirconditioner');
   if (sensor.temperature <= room.maxTemperature && sensor.temperature >= room.minTemperature) {
+    logger.info(`cooling process 중지(${room.name})`, {
+      data: {
+        max: sensor.temperature <= room.maxTemperature,
+        min: sensor.temperature >= room.minTemperature,
+        temperature: sensor.temperature,
+        maxTemperature: room.maxTemperature,
+        minTemperature: room.minTemperature,
+      },
+    });
     return;
   }
   if (sensor.temperature > room.maxTemperature) {

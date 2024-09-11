@@ -15,7 +15,7 @@ export default async (eventEmitter: EventEmitter) => {
         .then(eventRoom => {
           logger.info(`cooling process start(${eventRoom.name})`);
           if ([null, 0].includes(eventRoom.active)) return;
-          logger.info(`cooling processing...`, { data: { data, eventRoom } });
+          // logger.info(`cooling processing...`, { data: { data, eventRoom } });
           return coolingService.exec({ ...data, sensorId: room.sensorId }, eventRoom, eventEmitter);
         })
         .catch(error => {
