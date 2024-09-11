@@ -31,6 +31,9 @@ export default {
     refreshToken: heyCode.refresh_token || '',
     accessToken: heyCode.access_token || '',
   },
+  webhook: {
+    url: process.env.WEBHOOK_URL || '',
+  },
   https: {
     key: process.env.HTTPS_KEY_PATH || '',
     crt: process.env.HTTPS_CRT_PATH || '',

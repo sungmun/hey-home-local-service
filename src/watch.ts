@@ -3,6 +3,8 @@ import EventEmitter from 'events';
 import roomDao from './dao/sqlite/room.dao';
 import logger, { DeviceLogger } from './config/logger';
 import deviceDao from './dao/sqlite/device.dao';
+import axios from 'axios';
+import environment from './config/environment';
 
 export default async (eventEmitter: EventEmitter) => {
   const rooms = await roomDao.findAllRooms();
@@ -35,6 +37,17 @@ export default async (eventEmitter: EventEmitter) => {
           `change aircon status delay (${changeTime?.power}): ${Math.floor(
             (Date.now() - changeTime.changeTime) / 1000 / 60,
           )}분`,
+        );
+        axios.post(
+          environment.webhook.url,
+          `에어컨(${aircon.name})이 ${changeTime.power} 으로 변경되는데 ${Math.floor(
+            (Date.now() - changeTime.changeTime) / 1000 / 60,
+          )}분 걸렸습니다`,
+          {
+            headers: {
+              title: `에어컨 ${changeTime.power}`,
+            },
+          },
         );
       }
       changeTime.power = data.power;
