@@ -19,7 +19,7 @@ const makeDevicesTables = async (client: InstanceType<typeof DatabaseSync>) => {
 const makeAirconditionerTables = async (client: InstanceType<typeof DatabaseSync>) => {
   await client.exec(`
     CREATE TABLE IF NOT EXISTS Airconditioner(
-        deviceId TEXT,
+        deviceId TEXT PRIMARY KEY,
         power TINYINT NOT NULL DEFAULT 0,
         updatedAt INTEGER NOT NULL DEFAULT current_timestamp
     )`);
