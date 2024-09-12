@@ -4,8 +4,9 @@ import mResponse from '../../components/response';
 
 class HomeController {
   async putMode(req: Request, res: Response) {
-    return serivce.setMode(req.body.mode).then(mResponse.respondWithNoContent(res)).catch(mResponse.handleError(res));
+    return serivce.setMode(req.body.mode).then(mResponse.respondWithOK(res)).catch(mResponse.handleError(res));
   }
+
   async putRoomTemperature(req: Request, res: Response) {
     return serivce
       .setRoomTemperature(req.body)
