@@ -21,3 +21,9 @@ export type Sensor = {
   humidity: number; // 습도
   battery: number; // 베터리
 };
+
+export type Airconditioner = {
+  deviceId: string;
+  power: 0 | 1;
+  updatedAt: Date;
+};

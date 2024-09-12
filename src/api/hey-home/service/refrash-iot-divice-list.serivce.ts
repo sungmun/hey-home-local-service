@@ -2,6 +2,8 @@ import heyHomeAgent from '../../../components/hey-home-request';
 import deviceDao from '../../../dao/sqlite/device.dao';
 import roomDao from '../../../dao/sqlite/room.dao';
 import _ from 'lodash';
+import { Device } from '../../../types/device.type';
+import airconditionerDao from '../../../dao/sqlite/airconditioner.dao';
 
 const syncIotDevices = async devices => {
   await deviceDao.bulkInsertDevices(
@@ -42,16 +44,19 @@ const exec = async () => {
   // console.log('rooms', rooms);
   await roomDao.bulkInsertRooms(rooms);
 
-  let devices = [];
+  let devices: Device[] = [];
   await rooms.reduce(
     async (promise, room) => promise.then(async () => devices.push(...(await getRoomDevices(room.homeId, room.id)))),
     Promise.resolve(),
   );
-  // console.log('devices', devices);
-  const res = await heyHomeAgent.get(`/openapi/devices`);
-  const uniqDevices = _.uniqBy([...devices, ...res.data], 'id');
-  // console.log('devices res', uniqDevices);
 
+  const res = await heyHomeAgent.get(`/openapi/devices`);
+  const uniqDevices: Device[] = _.uniqBy([...devices, ...res.data], 'id');
+  uniqDevices
+    .filter(device => device.deviceType === 'IrAirconditioner')
+    .map(device => {
+      airconditionerDao.insertAirconditioner(device.id);
+    });
   await syncIotDevices(uniqDevices);
 };
 

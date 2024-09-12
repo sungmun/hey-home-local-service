@@ -16,16 +16,12 @@ const makeDevicesTables = async (client: InstanceType<typeof DatabaseSync>) => {
     )`);
 };
 
-const makeDevicesLogTables = async (client: InstanceType<typeof DatabaseSync>) => {
+const makeAirconditionerTables = async (client: InstanceType<typeof DatabaseSync>) => {
   await client.exec(`
-    CREATE TABLE IF NOT EXISTS DeviceLog(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+    CREATE TABLE IF NOT EXISTS Airconditioner(
         deviceId TEXT,
-        name TEXT,
-        deviceType TEXT,
-        roomId TEXT,
-        json TEXT,
-        time TEXT NOT NULL DEFAULT current_timestamp
+        power TINYINT NOT NULL DEFAULT 0,
+        updatedAt TEXT NOT NULL DEFAULT current_timestamp
     )`);
 };
 
@@ -43,7 +39,7 @@ const makeRoomTables = async (client: InstanceType<typeof DatabaseSync>) => {
 };
 
 const sync = async (client: InstanceType<typeof DatabaseSync>) => {
-  return Promise.all([makeDevicesTables(client), makeRoomTables(client), makeDevicesLogTables(client)])
+  return Promise.all([makeDevicesTables(client), makeRoomTables(client), makeAirconditionerTables(client)])
     .then(() => {
       logger.info('sqlite tables create success');
     })
