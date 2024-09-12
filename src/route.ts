@@ -6,8 +6,6 @@ import { NotFoundError } from './components/error';
 
 import heyHome from './api/hey-home';
 import home from './api/home';
-import modeModel from './model/common/mode.model';
-import deviceLogDao from './dao/sqlite/device-log.dao';
 const { healthCheck } = environment;
 
 export default (app: Express) => {
@@ -15,9 +13,7 @@ export default (app: Express) => {
   app.use('/v1/hey-home', heyHome);
 
   app.use('/v1/home', home);
-  app.get('/v1/device/log', (req, res) => {
-    res.status(200).json(deviceLogDao.getLogs());
-  });
+
   // 헬스체크
   app.route(healthCheck).get(mResponse.sendOK);
 
