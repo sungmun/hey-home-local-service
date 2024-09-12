@@ -32,12 +32,14 @@ export default async (eventEmitter: EventEmitter) => {
       if (aircon.power === data.power) return;
 
       DeviceLogger.silly(
-        `change aircon status delay (${data?.power}): ${Math.floor((Date.now() - aircon.updatedAt) / 1000 / 60)}분`,
+        `change aircon status delay (${data?.power}): ${Math.floor(
+          (Date.now() - Date.parse(aircon.updatedAt)) / 1000 / 60,
+        )}분`,
       );
       axios.post(
         environment.webhook.url,
         `에어컨(${name})이 ${data.power} 으로 변경되는데 ${Math.floor(
-          (Date.now() - aircon.updatedAt) / 1000 / 60,
+          (Date.now() - Date.parse(aircon.updatedAt)) / 1000 / 60,
         )}분 걸렸습니다`,
         {
           headers: {

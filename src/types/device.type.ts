@@ -25,5 +25,5 @@ export type Sensor = {
 export type Airconditioner = {
   deviceId: string;
   power: 0 | 1;
-  updatedAt: number;
+  updatedAt: string;
 };
