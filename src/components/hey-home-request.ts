@@ -23,14 +23,12 @@ heyHomeAgent.interceptors.request.use(config => {
   } else if (config.url.includes('/openapi')) {
     config.headers.Authorization = `Bearer ${environment.heyHome.accessToken}`;
   }
-  logger.info('hey home request Logging', { data: { url: config.url, headers: config.headers, body: config.data } });
+  logger.verbose('hey home request Logging', { data: { url: config.url, headers: config.headers, body: config.data } });
   return config;
 });
 
 heyHomeAgent.interceptors.response.use(
-  res => {
-    return res;
-  },
+  res => res,
   (error: AxiosError) => {
     const code = error.code;
     const status = error.response?.status;

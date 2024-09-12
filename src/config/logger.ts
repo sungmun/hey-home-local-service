@@ -24,6 +24,19 @@ if (environment.env === environmentConstants.ENV.DEVELOPMENT) {
 
 const deviceLogger = logger.child({ name: 'deviceLogger' });
 const routerLogger = logger.child({ name: 'routerLogger' });
+
+logger.add(
+  new dailyRotate({
+    level: 'verbose',
+    dirname: './logs',
+    filename: `${environment.serviceName}-verbose-%DATE%`,
+    extension: '.log',
+    format: winston.format.combine(winston.format(info => info.level === 'verbose' && info)(), winston.format.json()),
+    json: true,
+    maxFiles: 7,
+  }),
+);
+
 logger.add(
   new dailyRotate({
     level: 'info',
@@ -31,7 +44,7 @@ logger.add(
     filename: `${environment.serviceName}-service-%DATE%`,
     extension: '.log',
     format: winston.format.combine(
-      winston.format(info => ['http', 'silly'].includes(info.level) === false && info)(),
+      winston.format(info => ['http', 'silly', 'verbose'].includes(info.level) === false && info)(),
       winston.format.json(),
     ),
     json: true,
