@@ -7,19 +7,21 @@ import _ from 'lodash';
 import { Room } from '../../../types/room.type';
 import logger from '../../../config/logger';
 import { EventEmitter } from 'stream';
+import airconditionerDao from '../../../dao/sqlite/airconditioner.dao';
+
 const airConditionerChange = async (airConditioners: Device[], deviceStatus, eventEmitter?: EventEmitter) => {
   const power = {
     켜짐: 'true',
     꺼짐: 'false',
   };
-  const filterAirConditioners = airConditioners.filter(airConditioner => {
-    const id = airConditioner.id;
-    const status = liveDeviceDao.liveDevices.get(id);
-    if (status) {
-      return status.power !== deviceStatus.power;
-    }
-    return true;
-  });
+
+  const filterAirConditioners = await Promise.all(
+    airConditioners.filter(async airConditioner =>
+      airconditionerDao
+        .getAirconditionerByDeviceId(airConditioner.id)
+        .then(airconRecord => (airconRecord.power === 1 ? '켜짐' : '꺼짐') !== deviceStatus.power),
+    ),
+  );
 
   if (filterAirConditioners.length === 0) return;
 
@@ -42,7 +44,6 @@ const airconStatusChange = async (airconId: string, eventEmitter?: EventEmitter)
   if (eventEmitter === undefined) return;
   const res = await heyHomeAgent.get(`/openapi/device/${airconId}`);
   const state = res.data.deviceState;
-  liveDeviceDao.liveDevices.set(airconId, state);
   eventEmitter.emit(airconId, state);
 };
 

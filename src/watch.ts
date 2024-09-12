@@ -26,28 +26,30 @@ export default async (eventEmitter: EventEmitter) => {
 
   const aircons = await deviceDao.findDeviceByDeviceType('IrAirconditioner');
 
-  aircons.forEach(({ id, name }) => {
-    const aircon = airconditionerDao.getAirconditionerByDeviceId(id);
-    eventEmitter.on(aircon.deviceId, data => {
-      const nowPower = [1, true, '켜짐', 'true'].includes(data.power);
-      if (aircon.power === (nowPower ? 1 : 0)) return;
-      const updateAt = Date.parse(aircon.updatedAt) + 9 * 60 * 60 * 1000;
-      DeviceLogger.silly(
-        `change aircon status delay (${data?.power}): ${Math.floor((Date.now() - updateAt) / 1000 / 60)}분`,
-      );
-      axios.post(
-        environment.webhook.url,
-        `에어컨(${name})이 ${data.power} 으로 변경되는데 ${Math.floor(
-          (Date.now() - updateAt) / 1000 / 60,
-        )}분 걸렸습니다`,
-        {
-          headers: {
-            Title: `aircon ${data.power === '켜짐' ? 'on' : 'off'}`,
+  await Promise.all(
+    aircons.map(async ({ id, name }) => {
+      eventEmitter.on(id, async data => {
+        const aircon = await airconditionerDao.getAirconditionerByDeviceId(id);
+        const nowPower = [1, true, '켜짐', 'true'].includes(data.power);
+        if (aircon.power === (nowPower ? 1 : 0)) return;
+        const updateAt = Date.parse(aircon.updatedAt) + 9 * 60 * 60 * 1000;
+        DeviceLogger.silly(
+          `change aircon status delay (${data?.power}): ${Math.floor((Date.now() - updateAt) / 1000 / 60)}분`,
+        );
+        axios.post(
+          environment.webhook.url,
+          `에어컨(${name})이 ${data.power} 으로 변경되는데 ${Math.floor(
+            (Date.now() - updateAt) / 1000 / 60,
+          )}분 걸렸습니다`,
+          {
+            headers: {
+              Title: `aircon ${data.power === '켜짐' ? 'on' : 'off'}`,
+            },
           },
-        },
-      );
+        );
 
-      airconditionerDao.updateChangePowerByDeviceId(nowPower, id);
-    });
-  });
+        await airconditionerDao.updateChangePowerByDeviceId(nowPower, id);
+      });
+    }),
+  );
 };
