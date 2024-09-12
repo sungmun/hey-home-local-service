@@ -1,6 +1,4 @@
 import deviceDao from './../../../dao/sqlite/device.dao';
-// import deviceLogDao from './../../../dao/sqlite/device-log.dao';
-import liveDeviceDao from './../../../dao/local/live-device.dao';
 import { Device, Sensor } from './../../../types/device.type';
 import heyHomeAgent from './../../../components/hey-home-request';
 import _ from 'lodash';
@@ -15,14 +13,22 @@ const airConditionerChange = async (airConditioners: Device[], deviceStatus, eve
     꺼짐: 'false',
   };
 
-  const filterAirConditioners = await Promise.all(
-    airConditioners.filter(async airConditioner =>
-      airconditionerDao
-        .getAirconditionerByDeviceId(airConditioner.id)
-        .then(airconRecord => (airconRecord.power === 1 ? '켜짐' : '꺼짐') !== deviceStatus.power),
-    ),
-  );
+  const filterAirConditioners = airConditioners.filter(airConditioner => {
+    const airconRecord = airconditionerDao.getAirconditionerByDeviceId(airConditioner.id);
+    logger.info('aircon duplication', {
+      data: {
+        eqData: airconRecord.power === 1 ? '켜짐' : '꺼짐',
+        air: airconRecord.power,
+        changeAir: deviceStatus.power,
+        result: (airconRecord.power === 1 ? '켜짐' : '꺼짐') !== deviceStatus.power,
+      },
+    });
+    return (airconRecord.power === 1 ? '켜짐' : '꺼짐') !== deviceStatus.power;
+  });
 
+  logger.info('aircon filtering', {
+    data: filterAirConditioners,
+  });
   if (filterAirConditioners.length === 0) return;
 
   logger.info(`aircon ${deviceStatus.power}`);

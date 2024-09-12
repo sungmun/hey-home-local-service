@@ -11,15 +11,15 @@ const insertAirconditioner = async (deviceId: string): Promise<void> => {
 const updateChangePowerByDeviceId = async (power: boolean, deviceId: string): Promise<void> => {
   const client = sqliteConnect.getClient();
   client.exec(
-    `UPDATE Airconditioner SET power=${power ? 1 : 0},updatedAt=current_timestamp WHERE deviceId=${deviceId}`,
+    `UPDATE Airconditioner SET power=${power ? 1 : 0},updatedAt=current_timestamp WHERE deviceId='${deviceId}'`,
   );
 };
 
-const getAirconditionerByDeviceId = async (deviceId: string): Promise<Airconditioner> => {
+const getAirconditionerByDeviceId = (deviceId: string) => {
   const client = sqliteConnect.getClient();
   const statement = client.prepare(`SELECT * from Airconditioner WHERE deviceId=?`);
 
-  return <Airconditioner>await statement.get(deviceId);
+  return <Airconditioner>statement.get(deviceId);
 };
 
 export default { insertAirconditioner, updateChangePowerByDeviceId, getAirconditionerByDeviceId };
