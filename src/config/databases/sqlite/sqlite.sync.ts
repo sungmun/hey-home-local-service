@@ -21,7 +21,7 @@ const makeAirconditionerTables = async (client: InstanceType<typeof DatabaseSync
     CREATE TABLE IF NOT EXISTS Airconditioner(
         deviceId TEXT,
         power TINYINT NOT NULL DEFAULT 0,
-        updatedAt TEXT NOT NULL DEFAULT current_timestamp
+        updatedAt INTEGER NOT NULL DEFAULT current_timestamp
     )`);
 };
 
