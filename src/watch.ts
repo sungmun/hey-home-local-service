@@ -29,7 +29,8 @@ export default async (eventEmitter: EventEmitter) => {
   aircons.forEach(({ id, name }) => {
     const aircon = airconditionerDao.getAirconditionerByDeviceId(id);
     eventEmitter.on(aircon.deviceId, data => {
-      if (aircon.power === data.power) return;
+      const nowPower = [1, true, '켜짐', 'true'].includes(data.power);
+      if (aircon.power === (nowPower ? 1 : 0)) return;
 
       DeviceLogger.silly(
         `change aircon status delay (${data?.power}): ${Math.floor(
@@ -48,7 +49,7 @@ export default async (eventEmitter: EventEmitter) => {
         },
       );
 
-      airconditionerDao.updateChangePowerByDeviceId([1, true, '켜짐', 'true'].includes(data.power), id);
+      airconditionerDao.updateChangePowerByDeviceId(nowPower, id);
     });
   });
 };
