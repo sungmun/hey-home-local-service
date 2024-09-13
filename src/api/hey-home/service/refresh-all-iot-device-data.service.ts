@@ -19,7 +19,7 @@ const getDeviceCloudLiveData = async (device: Device) => {
 
 const exec = async (eventEmitter: EventEmitter) => {
   const devices = await deviceDao.findAllDevices();
-
+  logger.verbose;
   await devices.reduce(async (promise, cur) => {
     return promise.then(async () => {
       const liveData = await getDeviceCloudLiveData(cur).then(device => device.deviceState);

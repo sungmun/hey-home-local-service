@@ -63,7 +63,7 @@ const fixOnOffSetExec = async (fixOnOff: boolean, eventEmitter?: EventEmitter) =
 const exec = async (sensor: Sensor, room: Room, eventEmitter?: EventEmitter) => {
   const airConditioners = await deviceDao.findDeviceByDeviceType('IrAirconditioner');
 
-  if (sensor.temperature <= room.maxTemperature || sensor.temperature >= room.minTemperature) {
+  if (sensor.temperature <= room.maxTemperature && sensor.temperature >= room.minTemperature) {
     logger.info(`cooling process 중지(${room.name})`, {
       data: {
         max: sensor.temperature <= room.maxTemperature,
