@@ -53,15 +53,17 @@ const airconStatusChange = async (airconId: string, eventEmitter?: EventEmitter)
   eventEmitter.emit(airconId, state);
 };
 
+const fixOnOffSetExec = async (fixOnOff: boolean, eventEmitter?: EventEmitter) => {
+  const airConditioners = await deviceDao.findDeviceByDeviceType('IrAirconditioner');
+  const power = fixOnOff ? '켜짐' : '꺼짐';
+  const deviceStatus = { power, temperature: 18, fanSpeed: 3, mode: 0 };
+  await airConditionerChange(airConditioners, deviceStatus, eventEmitter);
+};
+
 const exec = async (sensor: Sensor, room: Room, eventEmitter?: EventEmitter) => {
   const airConditioners = await deviceDao.findDeviceByDeviceType('IrAirconditioner');
 
-  let power = 'true';
-  if (sensor.temperature > room.maxTemperature) {
-    power = '켜짐';
-  } else if (sensor.temperature < room.minTemperature) {
-    power = '꺼짐';
-  } else {
+  if (sensor.temperature <= room.maxTemperature || sensor.temperature >= room.minTemperature) {
     logger.info(`cooling process 중지(${room.name})`, {
       data: {
         max: sensor.temperature <= room.maxTemperature,
@@ -73,9 +75,12 @@ const exec = async (sensor: Sensor, room: Room, eventEmitter?: EventEmitter) => 
     });
     return;
   }
-
-  const deviceStatus = { power, temperature: 18, fanSpeed: 3, mode: 0 };
-  await airConditionerChange(airConditioners, deviceStatus, eventEmitter);
+  const defaultDeviceStatus = { power: '켜짐', temperature: 18, fanSpeed: 3, mode: 0 };
+  if (sensor.temperature > room.maxTemperature) {
+    await airConditionerChange(airConditioners, { ...defaultDeviceStatus, power: '켜짐' }, eventEmitter);
+  } else if (sensor.temperature < room.minTemperature) {
+    await airConditionerChange(airConditioners, { ...defaultDeviceStatus, power: '꺼짐' }, eventEmitter);
+  }
 };
 
-export default { exec };
+export default { exec, fixOnOffSetExec };
