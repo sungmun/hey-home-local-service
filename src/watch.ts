@@ -38,12 +38,15 @@ export default async (eventEmitter: EventEmitter) => {
         if (aircon.power === (nowPower ? 1 : 0)) return;
         if (nowPower) {
           airconTimer = setTimeout(() => {
-            const { updatedAt } = airconditionerDao.getAirconditionerByDeviceId(id);
-            if (updatedAt !== aircon.updatedAt) return;
-            coolingService.fixOnOffSetExec(false);
-          }, 1000 * 60 * 60);
+            coolingService.fixOnOffSetExec(false).then(() => {
+              logger.info('에어컨 타임 아웃');
+            });
+          }, 60 * 60 * 1000);
+          logger.info(`에어컨 타임 아웃 설정 : ${airconTimer}(${updateAt})`);
         } else if (airconTimer !== undefined) {
           clearTimeout(airconTimer);
+          airconTimer === undefined;
+          logger.info(`에어컨 타임 아웃 제거 :${airconTimer}`);
         }
 
         const delayTime = Math.floor((Date.now() - updateAt) / 1000 / 60);
