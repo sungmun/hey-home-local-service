@@ -7,6 +7,24 @@ import axios from 'axios';
 import environment from './config/environment';
 import airconditionerDao from './dao/sqlite/airconditioner.dao';
 import { clearTimeout, setTimeout } from 'timers';
+const airconChangeStatus = async (
+  after: { power },
+  name: string,
+  delayTime: number,
+  deviceId: string,
+  addText?: string,
+) => {
+  DeviceLogger.silly(`change aircon status delay (${after?.power}): ${delayTime}분`);
+  const isOn = [1, true, '켜짐', 'true'].includes(after.power);
+  const context = `에어컨(${name})이 ${after.power} 으로 변경되는데 ${delayTime}분 걸렸습니다.`;
+  await axios.post(environment.webhook.url, context + `${addText ? `(${addText})` : ''}`, {
+    headers: {
+      Title: `aircon ${isOn ? 'on' : 'off'}`,
+    },
+  });
+
+  await airconditionerDao.updateChangePowerByDeviceId(isOn, deviceId);
+};
 
 export default async (eventEmitter: EventEmitter) => {
   const rooms = await roomDao.findAllRooms();
@@ -33,35 +51,26 @@ export default async (eventEmitter: EventEmitter) => {
       eventEmitter.on(id, async data => {
         const aircon = airconditionerDao.getAirconditionerByDeviceId(id);
         const nowPower = [1, true, '켜짐', 'true'].includes(data.power);
-        const updateAt = Date.parse(aircon.updatedAt) + 9 * 60 * 60 * 1000;
 
+        const updateAt = Date.parse(aircon.updatedAt) + 9 * 60 * 60 * 1000;
+        const delayTime = Math.floor((Date.now() - updateAt) / 1000 / 60);
         if (aircon.power === (nowPower ? 1 : 0)) return;
         if (nowPower) {
           airconTimer = setTimeout(() => {
-            coolingService.fixOnOffSetExec(false).then(() => {
-              logger.info('에어컨 타임 아웃');
-            });
+            coolingService
+              .fixOnOffSetExec(false)
+              .then(() =>
+                airconChangeStatus(airconditionerDao.getAirconditionerByDeviceId(id), name, 60, id, '강제').then(() =>
+                  logger.info('에어컨 타임 아웃'),
+                ),
+              );
           }, 60 * 60 * 1000);
           logger.info(`에어컨 타임 아웃 설정 : ${airconTimer}(${updateAt})`);
         } else if (airconTimer !== undefined) {
           clearTimeout(airconTimer);
-          airconTimer === undefined;
           logger.info(`에어컨 타임 아웃 제거 :${airconTimer}`);
         }
-
-        const delayTime = Math.floor((Date.now() - updateAt) / 1000 / 60);
-        DeviceLogger.silly(`change aircon status delay (${data?.power}): ${delayTime}분`);
-        await axios.post(
-          environment.webhook.url,
-          `에어컨(${name})이 ${data.power} 으로 변경되는데 ${delayTime}분 걸렸습니다`,
-          {
-            headers: {
-              Title: `aircon ${data.power === '켜짐' ? 'on' : 'off'}`,
-            },
-          },
-        );
-
-        await airconditionerDao.updateChangePowerByDeviceId(nowPower, id);
+        await airconChangeStatus(data, name, delayTime, id);
       });
     }),
   );
