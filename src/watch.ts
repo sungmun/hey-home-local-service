@@ -16,7 +16,8 @@ const airconChangeStatus = async (
 ) => {
   DeviceLogger.silly(`change aircon status delay (${after?.power}): ${delayTime}분`);
   const isOn = [1, true, '켜짐', 'true'].includes(after.power);
-  const context = `에어컨(${name})이 ${after.power} 으로 변경되는데 ${delayTime}분 걸렸습니다.`;
+  const powerMessage = isOn ? '켜짐' : '꺼짐';
+  const context = `에어컨(${name})이 ${powerMessage} 으로 변경되는데 ${delayTime}분 걸렸습니다.`;
   await axios.post(environment.webhook.url, context + `${addText ? `(${addText})` : ''}`, {
     headers: {
       Title: `aircon ${isOn ? 'on' : 'off'}`,
